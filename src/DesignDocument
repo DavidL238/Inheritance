@@ -1,0 +1,31 @@
+class Main:
+
+
+class PhysicalHDD // extends PhysicalVolume {
+    // Every HDD will have a corresponding PhysicalVolume (for now at least)
+
+    Instance Variables:
+    private String name; // Stores the name of the hard drive as a String;
+    private int storage; // Stores the storage space of the hard drive as an Integer
+
+    Constructor:
+    // Sets the values of name and storage as the corresponding values in the parameters
+    public PhysicalHDD(String name, int storage) {
+
+        this.name = name;
+        this.storage = storage;
+    }
+
+    Methods:
+    // Returns the name of the HDD
+    public String getName() {
+        return name;
+    }
+
+    // Returns the storage size of the HDD
+    public int getStorage() {
+        return storage;
+    }
+}
+
+
