@@ -6,7 +6,7 @@ public class RunnerCommands {
 
     public void installDrive(String response) {
         int idx = response.indexOf(" ");
-        if (hasFewArgs(idx)) {
+        if (!hasTooFewArgs(idx)) {
             String name = response.substring(idx+1);
             idx = name.indexOf(" ");
             String size = name.substring(idx+1);
@@ -30,6 +30,7 @@ public class RunnerCommands {
         }
     }
 
+    // Prints all drives in driveList
     public void listDrives() {
         for (PhysicalHDD drives : driveList) {
             System.out.println(drives.getName() + " [" + drives.getStorage() + "]");
@@ -38,7 +39,7 @@ public class RunnerCommands {
 
     public void createPhysicalVolume(String response) {
         int idx = response.indexOf(" ");
-        if (hasFewArgs(idx)) {
+        if (!hasTooFewArgs(idx)) {
             String name = response.substring(idx + 1);
             idx = name.indexOf(" ");
             String driveName = name.substring(idx + 1);
@@ -49,9 +50,11 @@ public class RunnerCommands {
             for (String names : existingNames) {
                 if (names.equals(name)) {
                     isAvailable = false;
+                    System.out.println("Another Physical Volume is already assigned to this name!");
                     break;
                 }
             }
+
             if (isAvailable) {
                 PhysicalHDD addDrive = null;
                 for (PhysicalHDD drives : driveList) {
@@ -63,17 +66,16 @@ public class RunnerCommands {
                 if (!newVolume.hasNoErrors()) {
                     physicalVolumes.add(newVolume);
                 }
-            } else {
-                System.out.println("Another Physical Volume is already assigned to this name!");
             }
         }
     }
 
-    private boolean hasFewArgs(int idx) {
+    // Returns false if idx > -1
+    private boolean hasTooFewArgs(int idx) {
         if (idx == -1) {
             System.out.println("Error: Command has too few arguments");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }
