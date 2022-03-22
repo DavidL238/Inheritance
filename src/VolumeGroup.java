@@ -23,8 +23,19 @@ public class VolumeGroup {
     }
 
     public void listAll() {
+        int total = 0;
         for (PhysicalVolume v : inUse) {
-            System.out.println(v.getName());
+            String str = v.getHDD().getStorage();
+            for (int i = 0; i < str.length(); i++) {
+                String sub = str.substring(i, i+1);
+                try {
+                    total += Integer.parseInt(sub);
+                }
+                catch (NumberFormatException ignored) {}
+            }
+        }
+        for (PhysicalVolume v : inUse) {
+            System.out.println(v.getName() + ": total: [" + total + "] ");
         }
     }
 
