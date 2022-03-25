@@ -12,6 +12,7 @@ public class PhysicalVolume{
     public PhysicalVolume(String name, PhysicalHDD drive) {
         if (drive == null) {
             System.out.println("Error: Hard-drive doesn't exist");
+            c = true;
         }
         else {
             for (PhysicalHDD drives : existingDrives) {

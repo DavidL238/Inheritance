@@ -20,6 +20,18 @@ public class Main {
             else if (r.contains("pvcreate")) {
                 cmd.createPhysicalVolume(response);
             }
+            else if (r.contains("pvlist")) {
+
+            }
+            else if (r.contains("vgcreate")) {
+                cmd.createVolumeGroup(response);
+            }
+            else if (r.contains("vgextend")) {
+                cmd.extendVG(response);
+            }
+            else if (r.contains("vglist")) {
+
+            }
             else if (r.contains("exit")) {
                 exit = true;
             }
