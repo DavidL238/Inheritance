@@ -1,31 +1,257 @@
-class Main:
+Class Main:
+- Imports & initializes Scanner
+- Creates new RunnerCommands Object
+    - Executes corresponding commands for an input (F.E. install-drive executes installDrive() method)
+- Uses a while loop & cycles through until "exit" is inputted
+- Informs User of Unrecognized Commands
 
+Class RunnerCommands:
+- Comprised of methods executed in the Main class (Logic)
 
-class PhysicalHDD // extends PhysicalVolume {
-    // Every HDD will have a corresponding PhysicalVolume (for now at least)
+Instance Variables:
+    private ArrayList<PhysicalHDD> driveList = new ArrayList<>(); // List of initialized PhysicalHDDs
+    private ArrayList<PhysicalVolume> physicalVolumes = new ArrayList<>(); // List of initialized PhysicalVolumes
+    private ArrayList<VolumeGroup> volumeGroups = new ArrayList<>(); // List of initialized VolumeGroups
+    private ArrayList<LogicalVolume> logicalVolumes = new ArrayList<>(); // List of initialized LogicalVolumes
 
-    Instance Variables:
-    private String name; // Stores the name of the hard drive as a String;
-    private int storage; // Stores the storage space of the hard drive as an Integer
+Methods:
+public void installDrive(String response) {}
+- Takes String input (response)
+- Checks if the Hard Drive name is in use by checking all the names of PhysicalHDDs in driveList
+- Creates a new PhysicalHDD object if name is free
+- Stores the new object into the driveList ArrayList
 
-    Constructor:
-    // Sets the values of name and storage as the corresponding values in the parameters
-    public PhysicalHDD(String name, int storage) {
+public void listDrives() {}
+- Prints out the elements of all PhysicalHDD objects in driveList
 
-        this.name = name;
-        this.storage = storage;
-    }
+public void createPhysicalVolume(String response) {}
+- Takes String input (response)
+- Checks if PhysicalDrive object exists through checking the given String containing the Hard Drive Name
+    - Matches with any Physical Drives in drivesList
+- Checks if the name is available by checking all the names of PhysicalVolumes in physicalVolumes
+- Creates a new PhysicalVolume object if name is available & PhysicalHDD exists & is not used
+- Stores the new object into the physicalVolumes ArrayList
 
-    Methods:
-    // Returns the name of the HDD
+public void listPV() {} // :(
+- Creates two temporary ArrayLists hasVG and noVG
+- Iterates through all of the elements in physicalVolumes
+- Adds elements to ArrayLists accordingly
+- Sorts through hasVG by VolumeGroup name first (Alphabetical Order)
+- Sorts through hasVG by PhysicalVolume name (while VG name is the same)
+- Sorts through noVG by PhysicalVolume name
+- Prints out the elements in proper format
+
+public void createVolumeGroup(String response) {}
+- Takes String input (response)
+- Checks if VolumeGroup name is in use
+- Checks if Physical Volume exists in the physicalVolumes ArrayList (Checks names)
+- Creates new VolumeGroup object if both conditions above are true
+- Adds VolumeGroup object to volumeGroups
+- Sets PhysicalVolume instance variable VG to the newly created VG (why didn't I do this before finishing the sorting methods)
+
+public void extendVG(String response) {}
+- Takes String input (response)
+- Checks if VolumeGroup exists through checking names in the corresponding ArrayList
+- Checks if PhysicalVolume exists through checking names in the corresponding ArrayList
+- If both are true, executes the VolumeGroup's extend method
+- Else, print the Error PV Not Found first, and if the PV exists, print the Error VG Not Found
+
+public void listVG() {}
+- Sorts volumeGroups ArrayList Alphabetically
+- Prints the name, total storage, available storage, corresponding physical volumes, and uuid of each Volume Group
+
+public void createLV(String response) {}
+- Takes String input (response)
+- Checks if Volume Group exists
+- Checks if LV name is taken
+- Creates a new LogicalVolume object if both are true
+- Checks if LogicalVolume instance variable isn't null (VG Space is sufficient)
+- Uses VolumeGroup's addLV method
+
+public void extendLV(String response) {}
+- Takes String input (response)
+- Checks if LV exists
+- Creates a temporary LV object that references the one in the logicalVolumes ArrayList
+- Executes the extend() function in the LV class if found
+- Prints an Error if false
+
+public void listLV() {} // :(((
+- Sorts through each LV element's corresponding Volume Group name in logicalVolumes in alphabetical order
+- Sorts through each LV element's name in logicalVolumes in alphabetical order
+- Prints out the elements in the "name: [size] [VolumeGroup name] [uuid]" format
+
+public boolean checkArgs(int idx, String response) {}
+- Returns true if the number of spaces in response is 1 (through using an excessively convoluted loop)
+- Returns false if the number of spaces is > 1 or < 1 (Too few / Too many args)
+
+public String[] separateInfo(String response) {}
+- Given a string, it places each value separated by a space into a String array
+- F.E. "EA SPORTS" = ["EA", "SPORTS"]
+
+Class Installer:
+- Superclass to PhysicalHDD, PhysicalVolume, VolumeGroup, and LogicalVolume
+Instance Variables:
+    private String name
+    private String storage; // Name & Storage Space of subclasses as Strings
+    private int storageNum; // Storage String as an Integer
+    private final UUID uuid; // Random UUID
+
+Constructors:
+- Takes in String, Int, and UUID Objects as parameters depending on the constructor
+
+public Installer (String name, String storage, UUID uuid) {}
+- Sets storageNum as an int through using calculateStorage()
+
+public Installer (String name, int storageNum, UUID uuid) {}
+- Sets storage as storageNum + "G"
+
+Methods:
+public int calculateStorage(String storage) {}
+- Returns an integer given a String
+- Initially tries to parse the String into an int
+- Catches any NumberFormatException errors
+- Begins a loop, removing the last character of the string every loop while attempting to parse the String as an Int
+- If successful, returns the int value
+
+public void extend (int totalStorage){}
+- Sets the storageNum variable as totalStorage
+- Sets the storage variable as storageNum + "G"
+- Prints out the new Storage Amount
+
+Getters:
     public String getName() {
         return name;
     }
 
-    // Returns the storage size of the HDD
-    public int getStorage() {
+    public String getStorage() {
         return storage;
     }
-}
+
+    public int getStorageNum() {
+        return storageNum;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+Setters:
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setStorage(String storage) {
+        this.storage = storage;
+    }
+
+Class PhysicalHDD extends Installer:
+- No Instance Variables && No Methods
+
+Constructor:
+public PhysicalHDD (String name, String storage) {}
+- Uses the super constructor for all of its values (super(name, storage, null))
+
+Class PhysicalVolume extends Installer:
+- Imports UUID & ArrayList
+
+Instance Variables:
+    private PhysicalHDD hdd; // Associated HDD
+    private VolumeGroup vg; // Associated VolumeGroup
+    private static final ArrayList<PhysicalHDD> existingDrives = new ArrayList<>(); // List of HDDs that already have PhysicalVolumes
+
+Constructor:
+public PhysicalVolume(String name, PhysicalHDD drive) {}
+- Uses the super constructor and sets values to null initially
+- Checks if HDD is attached to another PV
+- If false, sets the superclass' instance variables to their proper values
+- Adds HDD to existingDrives Arraylist
+
+Methods:
+
+Getters:
+    public PhysicalHDD getHDD() {
+        return hdd;
+    }
+
+    public String getVGName() {
+        return vg.getName();
+    }
+
+Setter:
+    public void setVG(VolumeGroup a) {
+        vg = a;
+    }
+
+Class VolumeGroup() {}
+- Imports ArrayList and UUID
+
+Instance Variables:
+    private static ArrayList<PhysicalVolume> physicalVolumes = new ArrayList<>(); // List of physicalVolumes used
+    private ArrayList<PhysicalVolume> inUse = new ArrayList<>(); // List of PhysicalVolumes in use by an object's specific instance
+    private ArrayList<LogicalVolume> LVs = new ArrayList<>(); // List of LogicalVolumes in use by an object's specific instance
+    private int totalStorage, freeStorage; // Amount of total & free storage
+
+Constructor:
+public VolumeGroup(String name, PhysicalVolume pVolume) {}
+- Uses superclass constructor: super(name, pVolume.getStorage, UUID.randomUUID)
+- Checks if pVolume is in use (Inside of physicalVolumes ArrayList)
+- Adds pVolume to the physicalVolumes & inUse ArrayLists
+- Calculates the total storage (storage of pVolume)
+- Sets Free storage to total
+
+Methods:
+public void extend(PhysicalVolume v) {}
+- Checks if v is in use
+- Adds v to inUse and physicalVolumes ArrayLists
+- Recalculates Free and total storage by adding the storage value of v
+
+public boolean addLV(LogicalVolume lv) {}
+- Adds lv to the LVs ArrayList
+- Subtracts the storage value of lv from free storage
+- Returns true if possible, false if otherwise
+
+public void reduce(int amt) {}
+- Subtracts freeStorage by amt
+
+public static boolean checkUse(PhysicalVolume volume) {}
+- Iterates through physicalVolumes and checks if there are any name matches
+- Returns true if a match is found
+
+private void calculateTotal() {}
+- Iterates through all physicalVolumes in inUse and adds their storage values
+
+public boolean hasPV(PhysicalVolume a) {}
+- Checks if the PhysicalVolume is associated with the VolumeGroup instance
+- Returns true if PhysicalVolume is a part of the instance (in inUse)
+
+public String allAssociates() {}
+- Prints out the names of all PhysicalVolumes in the inUse ArrayList
+
+Getter:
+    public int getFreeStorage() {
+        return freeStorage;
+    }
+
+Class LogicalVolume extends Installer:
+- Imports UUID
+
+Instance Variables:
+ private VolumeGroup vg = null; // Associated Volume Group, Initially set to null
+
+Constructor:
+public LogicalVolume(String name, String size, VolumeGroup vg) {}
+- Uses super constructor: super(name, size, UUID.randomUUID())
+- Checks if the storage size of the logicalVolume > the free storage space in VolumeGroup
+- Returns the Error: Insufficient Storage Space if true
+
+public void extend(String amt) {}
+- Checks if the storage amount can be extended (VG has enough free storage space)
+- If so, it prints out a success message, followed by reducing the free storage amount of the VG instance and increasing the storage value of the LV instance
+- Else, prints an insufficient space error
+
+Getter Method:
+    public VolumeGroup getVG() {
+        return vg;
+    }
 
 

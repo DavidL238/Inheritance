@@ -1,22 +1,17 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class VolumeGroup {
-    private static ArrayList<PhysicalVolume> volumes = new ArrayList<>();
-    private static ArrayList<PhysicalVolume> inUse = new ArrayList<>();
-    private static ArrayList<LogicalVolume> LVs = new ArrayList<>();
-    private String volumeName;
+public class VolumeGroup extends Installer{
+    private static ArrayList<PhysicalVolume> physicalVolumes = new ArrayList<>();
+    private ArrayList<PhysicalVolume> inUse = new ArrayList<>();
+    private ArrayList<LogicalVolume> LVs = new ArrayList<>();
     private int totalStorage, freeStorage;
-    private UUID uuid;
 
-    public VolumeGroup(String volumeName, PhysicalVolume pVolume) {
-        boolean c = checkUse(pVolume);
-        if (!c) {
-            this.volumeName = volumeName;
+    public VolumeGroup(String name, PhysicalVolume pVolume) {
+        super(name, pVolume.getStorage(), UUID.randomUUID());
+        if (!checkUse(pVolume)) {
             inUse.add(pVolume);
-            volumes.add(pVolume);
-            uuid = UUID.randomUUID();
+            physicalVolumes.add(pVolume);
             calculateTotal();
             freeStorage = totalStorage;
         }
@@ -25,23 +20,32 @@ public class VolumeGroup {
     public void extend(PhysicalVolume v) {
         boolean c = checkUse(v);
         if (!c) {
-            volumes.add(v);
+            physicalVolumes.add(v);
             inUse.add(v);
+            int original = totalStorage;
             calculateTotal();
+            freeStorage += totalStorage - original;
+            super.extend(totalStorage);
         }
     }
 
-    public void listAll() {
-        int total = 0;
-        int test = 0;
+    public boolean addLV(LogicalVolume lv) {
+        if (lv.getStorageNum() <= freeStorage) {
+            LVs.add(lv);
+            freeStorage -= lv.getStorageNum();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
-    public void reduceFreeStorage(int amt) {
+    public void reduce(int amt) {
         freeStorage -= amt;
     }
 
-    public boolean checkUse(PhysicalVolume volume) {
-        for (PhysicalVolume v : volumes) {
+    public static boolean checkUse(PhysicalVolume volume) {
+        for (PhysicalVolume v : physicalVolumes) {
             if (v.getName().equals(volume.getName())) {
                 System.out.println("Error: Physical Volume in Use");
                 return true;
@@ -53,41 +57,30 @@ public class VolumeGroup {
     private void calculateTotal() {
         totalStorage = 0;
         for (PhysicalVolume v : inUse) {
-            totalStorage += calculateStorage(v);
+            totalStorage += calculateStorage(v.getHDD().getStorage());
         }
     }
 
-    private int calculateStorage(PhysicalVolume input) {
-        String str = input.getHDD().getStorage();
-        int test = 0;
-        for (int i = str.length() - 1; i > 0; i--) {
-            String sub = str.substring(0, i);
-            try {
-                test += Integer.parseInt(sub);
-                if (test > 0) {
-                    break;
-                }
+    public boolean hasPV(PhysicalVolume a) {
+        for (PhysicalVolume pv : inUse) {
+            if (a.getName().equals(pv.getName())) {
+                return true;
             }
-            catch (NumberFormatException ignored) {}
         }
-        return test;
+        return false;
     }
 
-    public static ArrayList<PhysicalVolume> getVolumes() {
-        return volumes;
-    }
-
-    public String getVolumeName() {
-        return volumeName;
+    public String allAssociates() {
+        String r = "";
+        for (PhysicalVolume pv : inUse) {
+            r = r + pv.getName() + ", ";
+        }
+        r = r.substring(0, r.length() - 2);
+        return r;
     }
 
     public int getFreeStorage() {
         return freeStorage;
     }
-
-    public void addLV(LogicalVolume lv) {
-        LVs.add(lv);
-    }
-
 
 }
