@@ -62,7 +62,6 @@ public class RunnerCommands {
                 else {
                     PhysicalVolume newVolume = new PhysicalVolume(name, addDrive);
                     physicalVolumes.add(newVolume);
-                    System.out.println("Success: Physical Volume Created");
                 }
             }
         }
@@ -82,18 +81,17 @@ public class RunnerCommands {
         for (int i = 0; i < hasVG.size() - 1; i++) {
             VolumeGroup a = null;
             VolumeGroup b = null;
-            for (int p = 0; p < volumeGroups.size(); p++) {
-                if (volumeGroups.get(p).hasPV(hasVG.get(i))) {
-                    a = volumeGroups.get(p);
+            for (VolumeGroup volumeGroup : volumeGroups) {
+                if (volumeGroup.hasPV(hasVG.get(i))) {
+                    a = volumeGroup;
                 }
-                if (volumeGroups.get(p).hasPV(hasVG.get(i+1))) {
-                    b = volumeGroups.get(p);
+                if (volumeGroup.hasPV(hasVG.get(i + 1))) {
+                    b = volumeGroup;
                 }
                 if (a == null) {
                     noVG.add(hasVG.remove(i));
-                }
-                else if (b == null) {
-                    noVG.add(hasVG.remove(i+1));
+                } else if (b == null) {
+                    noVG.add(hasVG.remove(i + 1));
                 }
                 if (a.getName().compareTo(b.getName()) > 0) {
                     PhysicalVolume temp = hasVG.get(i + 1);
@@ -129,10 +127,14 @@ public class RunnerCommands {
             }
         }
         for (PhysicalVolume a : hasVG) {
-            System.out.println(a.getName() + " [" + a.getStorageNum() + "G] [" + a.getVGName() + "] [" + a.getUuid() +"]");
+            if (!a.getName().equals("thisisatemporaryphysicalvolumepleasedisregardthislongstringliteral")) {
+                System.out.println(a.getName() + " [" + a.getStorageNum() + "G] [" + a.getVGName() + "] [" + a.getUuid() + "]");
+            }
         }
         for (PhysicalVolume b : noVG) {
-            System.out.println(b.getName() + " [" + b.getStorageNum() + "G] [" + b.getUuid() +"]");
+            if (!b.getName().equals("thisisatemporaryphysicalvolumepleasedisregardthislongstringliteral")) {
+                System.out.println(b.getName() + " [" + b.getStorageNum() + "G] [" + b.getUuid() +"]");
+            }
         }
     }
 

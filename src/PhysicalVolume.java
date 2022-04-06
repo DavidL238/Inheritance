@@ -7,7 +7,7 @@ public class PhysicalVolume extends Installer{
     private static final ArrayList<PhysicalHDD> existingDrives = new ArrayList<>();
 
     public PhysicalVolume(String name, PhysicalHDD drive) {
-        super(null, null, UUID.randomUUID());
+        super("thisisatemporaryphysicalvolumepleasedisregardthislongstringliteral", 0, UUID.randomUUID());
         boolean c = false;
         for (PhysicalHDD drives : existingDrives) {
             if (drive.getName().equals(drives.getName())) {
@@ -20,7 +20,14 @@ public class PhysicalVolume extends Installer{
             setStorage(drive.getStorage());
             hdd = drive;
             existingDrives.add(hdd);
+            System.out.println("Success: Physical Volume Created");
         }
+    }
+
+    public PhysicalVolume (String name, PhysicalHDD drive, UUID uuid) {
+        super(name, drive.getStorage(), uuid);
+        hdd = drive;
+        existingDrives.add(hdd);
     }
 
     public PhysicalHDD getHDD() {
