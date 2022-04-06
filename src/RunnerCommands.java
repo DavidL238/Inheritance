@@ -149,7 +149,7 @@ public class RunnerCommands {
     // Prints all drives in driveList
     public void listDrives() {
         for (PhysicalHDD drives : driveList) {
-            System.out.println(drives.getName() + " [" + drives.getStorage() + "]");
+            System.out.println(drives.getName() + " [" + drives.getStorageNum() + "G]");
         }
     }
 
