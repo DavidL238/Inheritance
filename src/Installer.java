@@ -9,7 +9,7 @@ public class Installer {
     public Installer (String name, String storage, UUID uuid) {
         this.name = name;
         this.storage = storage;
-        if (!storage.contains("G") || !storage.contains("g")) {
+        if (!this.storage.contains("G") || !this.storage.contains("g")) {
             this.storage = storage + "G";
         }
         storageNum = calculateStorage(storage);
