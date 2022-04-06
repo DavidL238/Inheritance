@@ -14,7 +14,6 @@ public class VolumeGroup extends Installer{
             physicalVolumes.add(pVolume);
             calculateTotal();
             freeStorage = totalStorage;
-            System.out.println("Success: Volume Group Created");
         }
     }
 
@@ -48,7 +47,6 @@ public class VolumeGroup extends Installer{
     public static boolean checkUse(PhysicalVolume volume) {
         for (PhysicalVolume v : physicalVolumes) {
             if (v.getName().equals(volume.getName())) {
-                System.out.println("Error: Physical Volume in Use");
                 return true;
             }
         }
@@ -85,5 +83,4 @@ public class VolumeGroup extends Installer{
     public int getFreeStorage() {
         return freeStorage;
     }
-
 }

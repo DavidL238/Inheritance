@@ -1,13 +1,19 @@
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
         RunnerCommands cmd = new RunnerCommands();
+        cmd.load();
+        Path currentPath = Paths.get("");
+        String p = currentPath.toAbsolutePath().toString();
         boolean exit = false;
         String response;
         while (!exit) {
-            System.out.print("$");
+            System.out.print(p + ">");
             response = scanner.nextLine();
             String r = response.toLowerCase();
             for (int i = response.length() - 1; i > 0; i--) {
@@ -49,11 +55,14 @@ public class Main {
                 cmd.listLV();
             }
             else if (r.contains("exit")) {
+                cmd.save();
                 exit = true;
             }
             else {
                 System.out.println("Error: Command not recognized");
             }
+            cmd.save();
+            System.out.println();
         }
     }
 }

@@ -1,10 +1,128 @@
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class RunnerCommands {
     private ArrayList<PhysicalHDD> driveList = new ArrayList<>();
     private ArrayList<PhysicalVolume> physicalVolumes = new ArrayList<>();
     private ArrayList<VolumeGroup> volumeGroups = new ArrayList<>();
     private ArrayList<LogicalVolume> logicalVolumes = new ArrayList<>();
+
+    public void save() throws IOException {
+        BufferedWriter saveHDD = new BufferedWriter(new FileWriter("src//Save//PhysicalHDDs.txt"));
+        BufferedWriter savePV = new BufferedWriter(new FileWriter("src//Save//PhysicalVolumes.txt"));
+        BufferedWriter saveVG = new BufferedWriter(new FileWriter("src//Save//VolumeGroups.txt"));
+        BufferedWriter saveLV = new BufferedWriter(new FileWriter("src//Save//LogicalVolumes.txt"));
+
+        for (PhysicalHDD hdds : driveList) {
+            saveHDD.write(hdds.getName() + "|" + hdds.getStorageNum());
+            saveHDD.newLine();
+        }
+        for (PhysicalVolume pvs : physicalVolumes) {
+            savePV.write(pvs.getName() + "|" + pvs.getHDD().getName());
+            savePV.newLine();
+        }
+        for (VolumeGroup vgs : volumeGroups) {
+            saveVG.write(vgs.getName());
+            for (PhysicalVolume pvs : physicalVolumes) {
+                if (vgs.hasPV(pvs)) {
+                    saveVG.write("|" + pvs.getName());
+                }
+            }
+            saveVG.newLine();
+        }
+        for (LogicalVolume lvs : logicalVolumes) {
+            saveLV.write(lvs.getName() + "|" + lvs.getStorageNum() + "|" + lvs.getVG().getName());
+            saveLV.newLine();
+        }
+        saveHDD.flush();
+        saveHDD.close();
+        savePV.flush();
+        savePV.close();
+        saveVG.flush();
+        saveVG.close();
+        saveLV.flush();
+        saveLV.close();
+    }
+
+    public void load() throws FileNotFoundException {
+        loadDrives();
+        loadPhysicalVolumes();
+        loadVolumeGroups();
+        loadLogicalVolumes();
+        System.out.println(
+                "Microsoft Windows [Version 10.0.19043.1586]\n" +
+                "(c) Microsoft Corporation. All rights reserved.");
+    }
+
+    public void loadDrives() throws FileNotFoundException {
+        File file = new File("src//Save//PhysicalHDDs.txt");
+        Scanner s = new Scanner(file);
+        while (s.hasNextLine()) {
+            String line = s.nextLine();
+            String[] params = line.split("\\|");
+            PhysicalHDD loadDrive = new PhysicalHDD(params[0], params[1]);
+            driveList.add(loadDrive);
+        }
+    }
+
+    public void loadPhysicalVolumes() throws FileNotFoundException {
+        File file = new File("src//Save//PhysicalVolumes.txt");
+        Scanner s = new Scanner(file);
+        while (s.hasNextLine()) {
+            String line = s.nextLine();
+            String[] params = line.split("\\|");
+            PhysicalHDD temp = null;
+            for (PhysicalHDD drives : driveList) {
+                if (drives.getName().equals(params[1])) {
+                    temp = drives;
+                }
+            }
+            PhysicalVolume loadVolume = new PhysicalVolume(params[0], temp);
+            physicalVolumes.add(loadVolume);
+        }
+    }
+
+    public void loadVolumeGroups() throws FileNotFoundException {
+        File file = new File("src//Save//VolumeGroups.txt");
+        Scanner s = new Scanner(file);
+        while (s.hasNextLine()) {
+            String line = s.nextLine();
+            String[] params = line.split("\\|");
+            ArrayList<PhysicalVolume> otherExtends = new ArrayList<>();
+            for (PhysicalVolume pvs : physicalVolumes) {
+                for (int i = 1; i < params.length; i++) {
+                    if (pvs.getName().equals(params[i])) {
+                        otherExtends.add(pvs);
+                    }
+                }
+            }
+            VolumeGroup loadVolume = new VolumeGroup(params[0], otherExtends.get(0));
+            for (PhysicalVolume pvs : otherExtends) {
+                loadVolume.extend(pvs);
+                pvs.setVG(loadVolume);
+            }
+            volumeGroups.add(loadVolume);
+        }
+    }
+
+    public void loadLogicalVolumes() throws FileNotFoundException {
+        File file = new File("src//Save//LogicalVolumes.txt");
+        Scanner s = new Scanner(file);
+        while (s.hasNextLine()) {
+            String line = s.nextLine();
+            String[] params = line.split("\\|");
+            VolumeGroup temp = null;
+            for (VolumeGroup vgs : volumeGroups) {
+                if (vgs.getName().equals(params[2])) {
+                    temp = vgs;
+                }
+            }
+            LogicalVolume loadLogicalVolume = new LogicalVolume(params[0], params[1], temp);
+            logicalVolumes.add(loadLogicalVolume);
+            temp.addLV(loadLogicalVolume);
+        }
+    }
 
     public void installDrive(String response) {
         int idx = response.indexOf(" ");
@@ -61,7 +179,10 @@ public class RunnerCommands {
                 }
                 else {
                     PhysicalVolume newVolume = new PhysicalVolume(name, addDrive);
-                    physicalVolumes.add(newVolume);
+                    if (newVolume.getHDD() != null) {
+                        physicalVolumes.add(newVolume);
+                        System.out.println("Success: Physical Volume Created");
+                    }
                 }
             }
         }
@@ -78,7 +199,7 @@ public class RunnerCommands {
                 noVG.add(physicalVolume);
             }
         }
-        for (int i = 0; i < hasVG.size() - 1; i++) {
+        for (int i = 0; i < hasVG.size() - 2; i++) {
             VolumeGroup a = null;
             VolumeGroup b = null;
             for (VolumeGroup volumeGroup : volumeGroups) {
@@ -88,14 +209,16 @@ public class RunnerCommands {
                 if (volumeGroup.hasPV(hasVG.get(i + 1))) {
                     b = volumeGroup;
                 }
+                boolean t = true;
                 if (a == null) {
                     noVG.add(hasVG.remove(i));
-                } else if (b == null) {
-                    noVG.add(hasVG.remove(i + 1));
+                    t = false;
                 }
-                assert a != null;
-                assert b != null;
-                if (a.getName().compareTo(b.getName()) > 0) {
+                if (b == null) {
+                    noVG.add(hasVG.remove(i + 1));
+                    t = false;
+                }
+                if (t && a.getName().compareTo(b.getName()) > 0) {
                     PhysicalVolume temp = hasVG.get(i + 1);
                     hasVG.set(i + 1, hasVG.get(i));
                     hasVG.set(i, temp);
@@ -166,7 +289,8 @@ public class RunnerCommands {
             }
             else if (c){
                 VolumeGroup newVG = new VolumeGroup(name, temp);
-                if (newVG.getFreeStorage() != 0) {
+                if (newVG.hasPV(temp)) {
+                    System.out.println("Success: Volume Group Created");
                     volumeGroups.add(newVG);
                     temp.setVG(newVG);
                 }
@@ -195,6 +319,7 @@ public class RunnerCommands {
             if (a != null && b != null) {
                 System.out.println("Success: " + pvName + " is extended to " + name);
                 a.extend(b);
+                System.out.println("New Storage Amount: " + a.getStorageNum() + "G");
             }
             else if (a != null) {
                 System.out.println("Error: PV Not Found");

@@ -20,7 +20,6 @@ public class PhysicalVolume extends Installer{
             setStorage(drive.getStorage());
             hdd = drive;
             existingDrives.add(hdd);
-            System.out.println("Success: Physical Volume Created");
         }
     }
 

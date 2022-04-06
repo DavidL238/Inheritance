@@ -1,11 +1,23 @@
+// Update 4/6/22 : 9 Days Late!
+// Changelog:
+// -  Imported Path & Paths to determine the path to the Main.java file
+// -  Fixed null errors when creating PhysicalVolume objects (oops, forgot to change super constructor parameters back)
+// -  Fixed null errors when pvlist is executed
+// -  Reduced excessive print statements when objects are loaded
+// -  Added saving & loading through BufferWriter objects
+//   -  Saves to text files in the "Save" folder
+// -  Added "G"s to the PhysicalDrives' storage string when missing in Installer Class
+
 Class Main:
-- Imports & initializes Scanner
+- Imports & initializes Scanner, Path, Paths, and IOException
 - Creates new RunnerCommands Object
     - Executes corresponding commands for an input (F.E. install-drive executes installDrive() method)
 - Uses a while loop & cycles through until "exit" is inputted
+- Saves after executing commands and before the program exits
 - Informs User of Unrecognized Commands
 
 Class RunnerCommands:
+Imports io.*, ArrayList, and Scanner
 - Comprised of methods executed in the Main class (Logic)
 
 Instance Variables:
@@ -15,6 +27,45 @@ Instance Variables:
     private ArrayList<LogicalVolume> logicalVolumes = new ArrayList<>(); // List of initialized LogicalVolumes
 
 Methods:
+public void save() {}
+- Creates four BufferWriter objects
+- Removes all contents of all files
+- Uses each BufferWriter to write to the corresponding files (ex. LogicalVolumes.txt)
+- Splits object parameters with pipes (|)
+
+public void load() throws FileNotFoundException {}
+- Uses the other four load helper methods
+- Prints initial Command Prompt text
+
+public void loadDrives() throws FileNotFoundException {}
+- Uses File & Scanner to read contents from the PhysicalHDDs.txt file
+- Uses a String array to split the contents
+- Creates new PhysicalDrives until the end of the file is reached
+- Adds new PhysicalDrives to driveList
+
+public void loadPhysicalVolumes() throws FileNotFoundException {}
+- Uses File & Scanner to read contents from the PhysicalVolumes.txt file
+- Uses a String array to split the contents
+- Finds the corresponding PhysicalDrive from driveList
+- Creates new PhysicalVolumes until the end of the file is reached
+- Adds new PhysicalVolumes to physicalVolumes
+
+public void loadVolumeGroups() throws FileNotFoundException {}
+- Uses File & Scanner to read contents from the VolumeGroups.txt file
+- Uses a String array to split the contents
+- Finds all corresponding PhysicalVolumes from physicalVolumes, including those later used in extensions
+- Creates a new VolumeGroup
+- Extends all corresponding PVs
+- Adds new VolumeGroups to volumeGroups
+
+public void loadLogicalVolumes() throws FileNotFoundException {}
+- Uses File & Scanner to read contents from the logicalVolumes.txt file
+- Uses a String array to split the contents
+- Finds the corresponding VolumeGroup from volumeGroups
+- Creates a new LogicalVolume
+- Calls VolumeGroup's addLV method to add the new LV to the VG
+- Adds new LogicalVolumes to logicalVolumes
+
 public void installDrive(String response) {}
 - Takes String input (response)
 - Checks if the Hard Drive name is in use by checking all the names of PhysicalHDDs in driveList

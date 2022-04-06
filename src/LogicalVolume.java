@@ -20,7 +20,8 @@ public class LogicalVolume extends Installer{
             System.out.println("Error: Insufficient Storage Space");
         }
         else {
-            System.out.println("Success: LG " + getName() + " Extended By " + addedStorage + "G");
+            System.out.println("Success: LV " + getName() + " Extended By " + addedStorage + "G");
+            System.out.println("New Storage Amount: " + getStorageNum() + "G");
             super.extend(addedStorage + getStorageNum());
             vg.reduce(addedStorage);
         }

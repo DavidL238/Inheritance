@@ -9,6 +9,9 @@ public class Installer {
     public Installer (String name, String storage, UUID uuid) {
         this.name = name;
         this.storage = storage;
+        if (!storage.contains("G") || !storage.contains("g")) {
+            this.storage = storage + "G";
+        }
         storageNum = calculateStorage(storage);
         this.uuid = uuid;
     }
@@ -21,17 +24,16 @@ public class Installer {
     }
 
     public int calculateStorage(String storage) {
-        String str = storage;
         int test = 0;
         try {
-            test += Integer.parseInt(str);
+            test += Integer.parseInt(storage);
             if (test > 0) {
                 return test;
             }
         }
         catch (NumberFormatException ignored) {}
-        for (int i = str.length() - 1; i > 0; i--) {
-            String sub = str.substring(0, i);
+        for (int i = storage.length() - 1; i > 0; i--) {
+            String sub = storage.substring(0, i);
             try {
                 test += Integer.parseInt(sub);
                 if (test > 0) {
@@ -46,8 +48,8 @@ public class Installer {
     public void extend (int totalStorage){
         storageNum = totalStorage;
         storage = storageNum + "G";
-        System.out.println("New Storage Amount: " + storageNum + "G");
     }
+
     public String getName() {
         return name;
     }
