@@ -93,6 +93,8 @@ public class RunnerCommands {
                 } else if (b == null) {
                     noVG.add(hasVG.remove(i + 1));
                 }
+                assert a != null;
+                assert b != null;
                 if (a.getName().compareTo(b.getName()) > 0) {
                     PhysicalVolume temp = hasVG.get(i + 1);
                     hasVG.set(i + 1, hasVG.get(i));
@@ -164,9 +166,10 @@ public class RunnerCommands {
             }
             else if (c){
                 VolumeGroup newVG = new VolumeGroup(name, temp);
-                volumeGroups.add(newVG);
-                System.out.println("Success: Volume Group Created");
-                temp.setVG(newVG);
+                if (newVG.getFreeStorage() != 0) {
+                    volumeGroups.add(newVG);
+                    temp.setVG(newVG);
+                }
             }
         }
     }
@@ -219,7 +222,10 @@ public class RunnerCommands {
         int idx = response.indexOf(" ");
         String rTemp = response.substring(idx + 1);
         idx = rTemp.indexOf(" ");
-        String lvName = rTemp.substring(0, idx);
+        String lvName = "";
+        if (idx != -1) {
+            lvName = rTemp.substring(0, idx);
+        }
         if (checkArgs(idx, rTemp)) {
             String[] info = separateInfo(rTemp);
             String vgName = info[0];

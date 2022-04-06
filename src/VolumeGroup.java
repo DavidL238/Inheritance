@@ -14,6 +14,7 @@ public class VolumeGroup extends Installer{
             physicalVolumes.add(pVolume);
             calculateTotal();
             freeStorage = totalStorage;
+            System.out.println("Success: Volume Group Created");
         }
     }
 
@@ -75,7 +76,9 @@ public class VolumeGroup extends Installer{
         for (PhysicalVolume pv : inUse) {
             r = r + pv.getName() + ", ";
         }
-        r = r.substring(0, r.length() - 2);
+        if (r.length() > 0) {
+            r = r.substring(0, r.length() - 2);
+        }
         return r;
     }
 

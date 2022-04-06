@@ -70,5 +70,6 @@ public class Installer {
 
     public void setStorage(String storage) {
         this.storage = storage;
+        storageNum = calculateStorage(storage);
     }
 }
