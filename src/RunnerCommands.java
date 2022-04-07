@@ -353,8 +353,8 @@ public class RunnerCommands {
         }
         if (checkArgs(idx, rTemp)) {
             String[] info = separateInfo(rTemp);
-            String vgName = info[0];
-            String size = info[1];
+            String size = info[0];
+            String vgName = info[1];
 
             VolumeGroup vg = null;
             for (VolumeGroup vgs : volumeGroups) {
